@@ -1,0 +1,44 @@
+version: '3'
+dotenv: ['.envrc']
+vars:
+  RELEASE_DIR: "./.release"
+  BUILD_TARGET: "./noteplan-build"
+tasks:
+  run:
+    cmds:
+      - go run main.go
+    silent: true
+  build:
+    requires:
+      vars: [BUILD_TARGET]
+    cmds:
+      - go build -v -o "{{.BUILD_TARGET}}"
+    silent: true
+  install:
+    cmds:
+      - go install
+    silent: true
+  artifacts:
+    requires:
+      vars: [RELEASE_DIR]
+    cmds:
+      - mkdir -p {{.RELEASE_DIR}}
+      - GOOS=darwin GOARCH=arm64 go build -v -o {{.RELEASE_DIR}}/noteplan-darwin-arm64
+      - GOOS=darwin GOARCH=amd64 go build -v -o {{.RELEASE_DIR}}/noteplan-darwin-amd64
+  tag:
+    deps: [artifacts]
+    cmds:
+      - git tag "$NOTEPLAN_VERSION"
+      - git push origin "$NOTEPLAN_VERSION"
+  release:
+    requires:
+      vars: [RELEASE_DIR]
+    deps: [tag]
+    cmds:
+      - gh release create --generate-notes "$NOTEPLAN_VERSION" {{.RELEASE_DIR}}/noteplan-*
+  clean:
+    requires:
+      vars: [BUILD_TARGET, RELEASE_DIR]
+    cmds:
+      - rm -rf {{.BUILD_TARGET}}
+      - rm -rf {{.RELEASE_DIR}}
