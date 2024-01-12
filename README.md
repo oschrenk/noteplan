@@ -77,6 +77,13 @@ cd noteplan
 task install
 ```
 
+**Via homebrew**
+
+```
+brew tap oschrenk/made git@github.com:oschrenk/homebrew-made
+brew install oschrenk/made/noteplan
+```
+
 ## Known Issues
 
 ### "[App]" would like to access data from other apps" warning
