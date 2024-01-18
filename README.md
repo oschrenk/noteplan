@@ -112,3 +112,9 @@ Since the executing process is the terminal, we can leverage the permissions of 
 #### sketchybar
 
 In case of [sketchybar](https://github.com/FelixKratz/SketchyBar), we could give it full disk access, but since it's a long running process and will only ask once when you start or restart the service, the impact is not as big, if you leave it off (recommended) and press "Allow" once when sketchybar starts.
+
+If you don't want to deal with popups, or giving SketchyBar "Full Disk Access", and if you only want to show the open todos for the current day, you can also use
+
+```
+lsappinfo -all info -only StatusLabel "co.noteplan.NotePlan3" | sed -nr 's/\"StatusLabel\"=\{ \"label\"=\"(.+)\" \}$/\1/p'
+```
