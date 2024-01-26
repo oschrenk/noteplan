@@ -4,38 +4,54 @@ Unofficial companion app for [NotePlan](https://noteplan.co/)
 
 ## Usage
 
-Print out today's task count
+### `noteplan todo`
+
+Print todos
 
 ```
 noteplan todo
+󰄴 Unpack luggage 
+󰝦 Grocery shopping
+   Eggs
+   Chicken
+   Butter
+4 tasks
+```
+
+### `noteplan summary`
+
+Print out today's and this weeks' task summary
+
+```
+noteplan summary
 Day, 2023-10-10, Open: 2
 Day, 2023-10-10, Closed: 1
 Week, 2023-W41, Open: 5
 Week, 2023-W41, Closed: 3
 ```
 
-Print out any date's task count
+Print out any date's task summary
 
 ```
-noteplan todo "last friday"
+noteplan summary "last friday"
 Day, 2023-10-06, Open: 2
 Day, 2023-10-06, Closed: 1
 Week, 2023-W40, Open: 6
 Week, 2023-W40, Closed: 2
 ```
 
-Print out any date's task count, only on the day
+Print out any day's task summary
 
 ```
-noteplan todo --day-only "last friday"
+noteplan summary --day-only "last friday"
 Day, 2023-10-06, Open: 2
 Day, 2023-10-06, Closed: 1
 ```
 
-Print out any date's task count, only during that week
+Print out any week's task summary
 
 ```
-noteplan todo --week-only "last friday"
+noteplan summary --week-only "last friday"
 Week, 2023-W40, Open: 6
 Week, 2023-W40, Closed: 2
 ```
@@ -43,7 +59,7 @@ Week, 2023-W40, Closed: 2
 Print as json
 
 ```
-noteplan todo --json "last friday"
+noteplan summary --json "last friday"
 {
   "day": {
     "iso": "2023-10-06",
@@ -61,7 +77,7 @@ noteplan todo --json "last friday"
 Fail on missing entries
 
 ```
-noteplan todo --fail-fast "next year"
+noteplan summary --fail-fast "next year"
 2024/01/10 14:52:44 sql: no rows in result set
 ```
 

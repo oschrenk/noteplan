@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/ijt/go-anytime"
-	"github.com/oschrenk/noteplan/noteplan"
-	"github.com/spf13/cobra"
-	"strings"
 	"time"
+
+	"github.com/ijt/go-anytime"
+	"github.com/spf13/cobra"
+
+	np "github.com/oschrenk/noteplan/noteplan"
 )
 
 func init() {
@@ -16,57 +16,58 @@ func init() {
 
 var todoCmd = &cobra.Command{
 	Use:   "todo",
-	Short: "Print the todo count",
+	Short: "Show todos",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		dayOnly, _ := cmd.Flags().GetBool("day-only")
-		weekOnly, _ := cmd.Flags().GetBool("week-only")
-		failFast, _ := cmd.Flags().GetBool("fail-fast")
-		asJson, _ := cmd.Flags().GetBool("json")
+		verbose, _ := cmd.Flags().GetBool("verbose")
+		np.Logger.Enabled = verbose
+		WithSummary, _ := cmd.Flags().GetBool("summary")
+		ShowCancelled, _ := cmd.Flags().GetBool("show-cancelled")
+		ShowDone, _ := cmd.Flags().GetBool("show-done")
 
-		var dateTime time.Time
-		if len(args) == 0 {
-			dateTime = time.Now()
-		} else {
-			parsedDay, err := anytime.Parse(args[0], time.Now())
+		now := time.Now()
+		dateTime := now
+		if len(args) > 0 {
+			rawDate := args[0]
+			parsedDay, err := anytime.Parse(rawDate, now)
 			if err != nil {
-				fmt.Println("Invalid argument")
-				return
+				np.Logger.Log(fmt.Sprintf("Failed parsing date \"%s\"", rawDate))
 			}
 			dateTime = parsedDay
 		}
 
-		// collect data
-		todosMap := make(map[string]*noteplan.Todos)
-		if !weekOnly {
-			dayTodos, _ := noteplan.Day(dateTime, failFast)
-			todosMap["day"] = dayTodos
-		}
-		if !dayOnly {
-			weekTodos, _ := noteplan.Week(dateTime, failFast)
-			todosMap["week"] = weekTodos
-		}
-
-		// print as json
-		if asJson {
-			s, _ := json.MarshalIndent(todosMap, "", "  ")
-			fmt.Print(string(s))
-
-			// print as text
-		} else {
-			for mode, todos := range todosMap {
-				titledMode := strings.Title(mode)
-				iso := todos.Iso
-				fmt.Println(fmt.Sprint(titledMode, ", ", iso, ", Open: ", todos.Open))
-				fmt.Println(fmt.Sprint(titledMode, ", ", iso, ", Closed: ", todos.Closed))
+		noteplan := np.NewInstance()
+		tasks, err := noteplan.GetTasks(dateTime)
+		open := 0
+		if err == nil {
+			for _, task := range tasks {
+				switch task.State {
+				case np.Cancelled:
+					if ShowCancelled {
+						fmt.Println(task.String())
+					}
+				case np.Done:
+					if ShowDone {
+						fmt.Println(task.String())
+					}
+				case np.Open:
+					fmt.Println(task.String())
+					if task.Category != np.Bullet {
+						open = open + 1
+					}
+				}
 			}
+		}
+
+		if WithSummary {
+			fmt.Println(open, "open tasks")
 		}
 	},
 }
 
 func init() {
-	todoCmd.Flags().BoolP("day-only", "d", false, "Show count for the day only")
-	todoCmd.Flags().BoolP("week-only", "w", false, "Show count for the week only")
-	todoCmd.Flags().BoolP("fail-fast", "f", false, "Fail if entry not found. If false, return 0 counts.")
-	todoCmd.Flags().BoolP("json", "j", false, "Output as json")
+	todoCmd.Flags().BoolP("verbose", "v", false, "Log verbose")
+	todoCmd.Flags().BoolP("summary", "s", true, "Print summary")
+	todoCmd.Flags().BoolP("show-cancelled", "c", true, "Show Cancelled")
+	todoCmd.Flags().BoolP("show-done", "d", true, "Show Done")
 }
