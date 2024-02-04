@@ -22,6 +22,7 @@ var todoCmd = &cobra.Command{
 		verbose, _ := cmd.Flags().GetBool("verbose")
 		np.Logger.Enabled = verbose
 		WithSummary, _ := cmd.Flags().GetBool("summary")
+		ShowBullet, _ := cmd.Flags().GetBool("show-bullet")
 		ShowCancelled, _ := cmd.Flags().GetBool("show-cancelled")
 		ShowDone, _ := cmd.Flags().GetBool("show-done")
 
@@ -51,7 +52,10 @@ var todoCmd = &cobra.Command{
 						fmt.Println(task.String())
 					}
 				case np.Open:
-					fmt.Println(task.String())
+					if (task.Category == np.Bullet && ShowBullet) ||
+						(task.Category == np.Todo) || (task.Category == np.Checklist) {
+						fmt.Println(task.String())
+					}
 					if task.Category != np.Bullet {
 						open = open + 1
 					}
@@ -70,4 +74,5 @@ func init() {
 	todoCmd.Flags().BoolP("summary", "s", true, "Print summary")
 	todoCmd.Flags().BoolP("show-cancelled", "c", true, "Show Cancelled")
 	todoCmd.Flags().BoolP("show-done", "d", true, "Show Done")
+	todoCmd.Flags().BoolP("show-bullet", "b", false, "Show Bullet")
 }
