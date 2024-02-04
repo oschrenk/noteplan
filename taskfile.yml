@@ -36,6 +36,11 @@ tasks:
     deps: [tag]
     cmds:
       - gh release create --generate-notes "$NOTEPLAN_VERSION" {{.RELEASE_DIR}}/noteplan-*
+  sha:
+    requires:
+      vars: [RELEASE_DIR]
+    cmds:
+      - sha256sum {{.RELEASE_DIR}}/noteplan-*
   clean:
     requires:
       vars: [BUILD_TARGET, RELEASE_DIR]
