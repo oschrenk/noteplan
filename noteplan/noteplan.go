@@ -13,8 +13,18 @@ func NewInstance() Noteplan {
 	return Noteplan{settings: LoadSettings()}
 }
 
-func (noteplan *Noteplan) GetTasks(dateTime time.Time) ([]Task, error) {
-	entry := fmt.Sprint(dateTime.Format("20060102"), ".", noteplan.settings.Extension)
+func (noteplan *Noteplan) GetTasks(dateTime time.Time, tp TimePrecision) ([]Task, error) {
+	entry := ""
+	switch tp {
+	case Day:
+		entry = fmt.Sprint(dateTime.Format("20060102"), ".", noteplan.settings.Extension)
+	case Week:
+		year, week := dateTime.ISOWeek()
+		entry = fmt.Sprint(year, "-W", fmt.Sprintf("%02d", week), ".", noteplan.settings.Extension)
+		fmt.Println(entry)
+	default:
+		return nil, fmt.Errorf("Unsupported precision %s", tp)
+	}
 	path := noteplan.settings.CalendarDataPath + "/" + entry
 	data, doc, err := parseMarkdown(path)
 	if err != nil {
