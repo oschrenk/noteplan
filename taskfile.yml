@@ -9,6 +9,9 @@ tasks:
     cmds:
       - go run main.go
     silent: true
+  check:
+    cmds:
+      - staticcheck ./...
   build:
     requires:
       vars: [BUILD_TARGET]
@@ -26,6 +29,7 @@ tasks:
       - mkdir -p {{.RELEASE_DIR}}
       - GOOS=darwin GOARCH=arm64 go build -v -o {{.RELEASE_DIR}}/{{.APP_NAME}}-darwin-arm64
       - GOOS=darwin GOARCH=amd64 go build -v -o {{.RELEASE_DIR}}/{{.APP_NAME}}-darwin-amd64
+    deps: [check]
   tag:
     deps: [artifacts]
     cmds:
@@ -42,9 +46,6 @@ tasks:
       vars: [APP_NAME, RELEASE_DIR]
     cmds:
       - sha256sum {{.RELEASE_DIR}}/{{APP_NAME}}-*
-  check:
-    cmds:
-      - staticcheck ./...
   clean:
     requires:
       vars: [BUILD_TARGET, RELEASE_DIR]
