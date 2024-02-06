@@ -1,7 +1,6 @@
 package noteplan
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -22,7 +21,7 @@ func LoadSettings() Settings {
 	CalendarDataPath := os.ExpandEnv("$HOME/Library/Containers/co.noteplan.NotePlan3/Data/Library/Application Support/co.noteplan.NotePlan3/Calendar")
 	NoteCachePath := os.ExpandEnv("$HOME/Library/Containers/co.noteplan.NotePlan3/Data/Library/Application Support/co.noteplan.NotePlan3/Caches/note-cache.db")
 
-	file, err := ioutil.ReadFile(GroupSettingsPath)
+	file, err := os.ReadFile(GroupSettingsPath)
 	if err != nil {
 		log.Panicf("failed reading file: %s", err)
 	}
