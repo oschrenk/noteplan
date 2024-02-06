@@ -32,6 +32,21 @@ func (tp TimePrecision) hours() int64 {
 	return -1
 }
 
+func (tp TimePrecision) String() string {
+	switch tp {
+	case Day:
+		return "Day"
+	case Week:
+		return "Week"
+	case Month:
+		return "Month"
+	case Year:
+		return "Year"
+	default:
+		return fmt.Sprintf("Unknown (%d)", int(tp))
+	}
+}
+
 func isInt(val float64) bool {
 	return val == float64(int(val))
 }
@@ -39,7 +54,7 @@ func isInt(val float64) bool {
 func BuildTimePrecision(d time.Duration) (TimePrecision, error) {
 	fullDurationInHours := (d + time.Second).Hours()
 	if !isInt(fullDurationInHours) {
-		return -1, fmt.Errorf("Unsupported duration %s. Must be full hour.", d)
+		return -1, fmt.Errorf("unsupported duration %s. Must be full hour", d)
 	}
 	hours := int64(fullDurationInHours)
 
@@ -59,6 +74,6 @@ func BuildTimePrecision(d time.Duration) (TimePrecision, error) {
 		return Day, nil
 	}
 
-	return -1, fmt.Errorf("Unsupported duration %s. Unknown precision.", d)
+	return -1, fmt.Errorf("unsupported duration %s. Unknown precision", d)
 
 }

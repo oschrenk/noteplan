@@ -23,7 +23,7 @@ func (noteplan *Noteplan) GetTasks(dateTime time.Time, tp TimePrecision) ([]Task
 		entry = fmt.Sprint(year, "-W", fmt.Sprintf("%02d", week), ".", noteplan.settings.Extension)
 		fmt.Println(entry)
 	default:
-		return nil, fmt.Errorf("Unsupported precision %s", tp)
+		return nil, fmt.Errorf("unsupported precision %s", tp)
 	}
 	path := noteplan.settings.CalendarDataPath + "/" + entry
 	data, doc, err := parseMarkdown(path)

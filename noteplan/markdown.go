@@ -2,7 +2,7 @@ package noteplan
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/yuin/goldmark"
@@ -23,7 +23,7 @@ func parseMarkdown(path string) ([]byte, ast.Node, error) {
 	}
 	defer file.Close()
 
-	data, err := ioutil.ReadAll(file)
+	data, err := io.ReadAll(file)
 	if err != nil {
 		Logger.Log(fmt.Sprintf("Failed reading \"%s\"", path))
 		return nil, nil, err
