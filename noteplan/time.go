@@ -32,6 +32,21 @@ func (tp TimePrecision) hours() int64 {
 	return -1
 }
 
+func (tp TimePrecision) String() string {
+	switch tp {
+	case Day:
+		return "Day"
+	case Week:
+		return "Week"
+	case Month:
+		return "Month"
+	case Year:
+		return "Year"
+	default:
+		return fmt.Sprintf("Unknown (%d)", int(tp))
+	}
+}
+
 func isInt(val float64) bool {
 	return val == float64(int(val))
 }
