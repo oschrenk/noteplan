@@ -42,6 +42,9 @@ tasks:
       vars: [APP_NAME, RELEASE_DIR]
     cmds:
       - sha256sum {{.RELEASE_DIR}}/{{APP_NAME}}-*
+  check:
+    cmds:
+      - staticcheck ./...
   clean:
     requires:
       vars: [BUILD_TARGET, RELEASE_DIR]
