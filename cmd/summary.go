@@ -3,11 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/ijt/go-anytime"
 	"github.com/spf13/cobra"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	np "github.com/oschrenk/noteplan/noteplan"
 )
@@ -59,7 +60,7 @@ var summaryCmd = &cobra.Command{
 			// print as text
 		} else {
 			for mode, taskSummary := range taskSummaries {
-				titledMode := strings.Title(mode)
+				titledMode := cases.Title(language.English, cases.NoLower).String(mode)
 				iso := taskSummary.Iso
 				fmt.Println(fmt.Sprint(titledMode, ", ", iso, ", Open: ", taskSummary.Open))
 				fmt.Println(fmt.Sprint(titledMode, ", ", iso, ", Closed: ", taskSummary.Closed))
