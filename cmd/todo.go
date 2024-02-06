@@ -28,17 +28,23 @@ var todoCmd = &cobra.Command{
 
 		now := time.Now()
 		dateTime := now
+		precision := np.Day
 		if len(args) > 0 {
 			rawDate := args[0]
-			parsedDay, err := anytime.Parse(rawDate, now)
+			parsedRange, err := anytime.ParseRange(rawDate, now)
 			if err != nil {
 				np.Logger.Log(fmt.Sprintf("Failed parsing date \"%s\"", rawDate))
+			}
+			parsedDay := parsedRange.Time
+			precision, err = np.BuildTimePrecision(parsedRange.Duration)
+			if err != nil {
+				np.Logger.Log(fmt.Sprintf("Can't parse precision \"%s\"", rawDate))
 			}
 			dateTime = parsedDay
 		}
 
 		noteplan := np.NewInstance()
-		tasks, err := noteplan.GetTasks(dateTime)
+		tasks, err := noteplan.GetTasks(dateTime, precision)
 		open := 0
 		if err == nil {
 			for _, task := range tasks {
