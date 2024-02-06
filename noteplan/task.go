@@ -209,7 +209,7 @@ func (noteplan *Noteplan) parseTasks(data []byte, doc ast.Node) []Task {
 		}
 
 		if n, ok := node.(*ast.ListItem); ok && enter {
-			item := n.FirstChild().(ast.Node)
+			item := n.FirstChild()
 			text := getText(item, data)
 			task := noteplan.parseTask(markerMap[depth], text, depth)
 			tasks = append(tasks, task)
