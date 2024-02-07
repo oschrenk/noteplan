@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strings"
 
+	tast "github.com/oschrenk/noteplan/extension/ast"
+
 	"github.com/fatih/color"
 	"github.com/yuin/goldmark/ast"
 )
@@ -213,6 +215,10 @@ func (noteplan *Noteplan) parseTasks(data []byte, doc ast.Node) []Task {
 			text := getText(item, data)
 			task := noteplan.parseTask(markerMap[depth], text, depth)
 			tasks = append(tasks, task)
+		}
+
+		if n, ok := node.(*tast.TaskCheckBox); ok && enter {
+			fmt.Println(n)
 		}
 
 		return ast.WalkContinue, nil

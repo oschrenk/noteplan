@@ -53,8 +53,8 @@ func (s *taskCheckBoxParser) Parse(parent gast.Node, block text.Reader, pc parse
 	}
 	value := line[m[2]:m[3]][0]
 	block.Advance(m[1])
-	checked := value == 'x' || value == 'X'
-	return ast.NewTaskCheckBox(checked)
+	state := ast.NewTaskState(value)
+	return ast.NewTaskCheckBox(state)
 }
 
 func (s *taskCheckBoxParser) CloseBlock(parent gast.Node, pc parser.Context) {
