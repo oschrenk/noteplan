@@ -10,7 +10,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	np "github.com/oschrenk/noteplan/noteplan"
+	np "github.com/oschrenk/noteplan/internal"
 )
 
 func init() {

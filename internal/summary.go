@@ -1,4 +1,4 @@
-package noteplan
+package internal
 
 type TaskSummary struct {
 	Iso    string `json:"iso"`

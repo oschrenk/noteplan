@@ -3,7 +3,7 @@ dotenv: ['VERSION']
 vars:
   APP_NAME: "noteplan"
   RELEASE_DIR: "./.release"
-  BUILD_TARGET: "./{{.APP_NAME}}-build"
+  BUILD_TARGET: "./{{.APP_NAME}}"
 tasks:
   run:
     cmds:

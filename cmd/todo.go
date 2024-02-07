@@ -7,7 +7,7 @@ import (
 	"github.com/ijt/go-anytime"
 	"github.com/spf13/cobra"
 
-	np "github.com/oschrenk/noteplan/noteplan"
+	np "github.com/oschrenk/noteplan/internal"
 )
 
 func init() {

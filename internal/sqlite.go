@@ -1,4 +1,4 @@
-package noteplan
+package internal
 
 import (
 	"database/sql"
