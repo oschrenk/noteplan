@@ -12,6 +12,11 @@ tasks:
   check:
     cmds:
       - staticcheck ./...
+  tidy:
+    cmds:
+      - go mod tidy
+  lint:
+    deps: [check, tidy]
   build:
     requires:
       vars: [BUILD_TARGET]
@@ -29,7 +34,7 @@ tasks:
       - mkdir -p {{.RELEASE_DIR}}
       - GOOS=darwin GOARCH=arm64 go build -v -o {{.RELEASE_DIR}}/{{.APP_NAME}}-darwin-arm64
       - GOOS=darwin GOARCH=amd64 go build -v -o {{.RELEASE_DIR}}/{{.APP_NAME}}-darwin-amd64
-    deps: [check]
+    deps: [tidy]
   tag:
     deps: [artifacts]
     cmds:
