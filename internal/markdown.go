@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 
+	extension "github.com/oschrenk/noteplan/extension"
+
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/text"
@@ -13,8 +15,7 @@ import (
 func parseMarkdown(path string) ([]byte, ast.Node, error) {
 
 	markdown := goldmark.New(
-		goldmark.WithExtensions(),
-	)
+		goldmark.WithExtensions(extension.TaskList))
 
 	file, err := os.Open(path)
 	if err != nil {
