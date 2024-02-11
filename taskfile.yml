@@ -1,5 +1,5 @@
 version: '3'
-dotenv: ['.envrc']
+dotenv: ['VERSION']
 vars:
   APP_NAME: "noteplan"
   RELEASE_DIR: "./.release"
