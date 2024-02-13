@@ -1,7 +1,9 @@
 # Development
 
-- `task build` **Build**
-- `task run` **Run**
+- **build** `task build`
+- **run** `task run`
+- **test** `task test`
+- **lint** `task lint`
 
 ## Release
 
