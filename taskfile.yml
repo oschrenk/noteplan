@@ -61,3 +61,7 @@ tasks:
     cmds:
       - rm -rf {{.BUILD_TARGET}}
       - rm -rf {{.RELEASE_DIR}}
+  watch:
+    cmds:
+      - mkdir -p tmp
+      - air
