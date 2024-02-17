@@ -1,20 +1,16 @@
 package internal
 
 import (
-	"bytes"
 	"fmt"
-	"log"
-	"regexp"
 	"strings"
 
-	tast "github.com/oschrenk/noteplan/extension/ast"
+	tasklist "github.com/oschrenk/noteplan/extension/tasklist"
 
 	"github.com/fatih/color"
 	"github.com/yuin/goldmark/ast"
 )
 
 type TaskCategory int64
-type TaskState int64
 
 const (
 	Bullet TaskCategory = iota
@@ -22,29 +18,21 @@ const (
 	Todo
 )
 
-const (
-	Open TaskState = iota
-	Cancelled
-	Done
-)
-
-func (s TaskState) Trigger() string {
-	switch s {
-	case Open:
-		return " "
-	case Cancelled:
+func (t TaskCategory) String() string {
+	switch {
+	case t == Bullet:
+		return "*"
+	case t == Checklist:
+		return "+"
+	case t == Todo:
 		return "-"
-	case Done:
-		return "x"
 	}
-
-	log.Panicf("failed getting trigger for state: %s", s)
-	return "unknown"
+	return "?"
 }
 
 type Task struct {
 	Category TaskCategory
-	State    TaskState
+	State    tasklist.TaskState
 	Text     string
 	Depth    int
 }
@@ -56,20 +44,20 @@ func (t Task) String() string {
 		char = "" // nf-oct-dot_fill, \uf444
 	case t.Category == Todo:
 		switch {
-		case t.State == Open:
+		case t.State == tasklist.Open:
 			char = "󰝦" // nf-md-checkbox_blank_circle_outline, \udb81\udf66
-		case t.State == Cancelled:
+		case t.State == tasklist.Cancelled:
 			char = "" // nf-oct-x_circle, \uf52f
-		case t.State == Done:
+		case t.State == tasklist.Done:
 			char = "󰄴" // nf-md-checkbox_marked_circle_outline, \udb80\udd34
 		}
 	case t.Category == Checklist:
 		switch {
-		case t.State == Open:
+		case t.State == tasklist.Open:
 			char = "" // nf-seti-checkbox_unchecked, \ue640
-		case t.State == Cancelled:
+		case t.State == tasklist.Cancelled:
 			char = "󱋭" // nf-md-checkbox_blank_off_outline, \uf52f
-		case t.State == Done:
+		case t.State == tasklist.Done:
 			char = "󰄵" // nf-md-checkbox_marked_outline, \udb80\udd35
 		}
 	}
@@ -79,7 +67,7 @@ func (t Task) String() string {
 	none := color.New().SprintFunc()
 
 	colorize := none
-	if t.State == Done {
+	if t.State == tasklist.Done {
 		colorize = grey
 	}
 
@@ -121,7 +109,7 @@ func (t Task) String() string {
 // - bullet
 // *  double spaced todo
 // -  double spaced bullet
-func (noteplan *Noteplan) parseTask(marker string, task string, depth int) Task {
+func (noteplan *Noteplan) BuildTask(marker string, depth int, state tasklist.TaskState, text string) Task {
 	var category TaskCategory
 
 	switch {
@@ -140,85 +128,65 @@ func (noteplan *Noteplan) parseTask(marker string, task string, depth int) Task 
 	case marker == "+":
 		category = Checklist
 	}
-	text := strings.TrimSpace(task)
 
-	return noteplan.parseTaskState(category, text, depth)
-}
-
-func (noteplan *Noteplan) parseTaskState(category TaskCategory, text string, depth int) Task {
-	var state TaskState
-
-	stateRegEx := `^\[([\s-x])\].*`
-	re := regexp.MustCompile(stateRegEx)
-	matches := re.FindStringSubmatch(text)
-
-	// if any state trigger is found we assume it's a Todo
-	if len(matches) == 2 {
-		// the user might have changed their settings in the past or might have
-		// manually changed a bullet item into a task item by using task markers
-		// if it's checklist we keep it
-		if category == Bullet {
-			category = Todo
-		}
-		stateChar := matches[1]
-		text = strings.TrimSpace(text[3:])
-		switch {
-		case stateChar == Open.Trigger():
-			state = Open
-		case stateChar == Cancelled.Trigger():
-			state = Cancelled
-		case stateChar == Done.Trigger():
-			state = Done
-		}
-
-		// otherwise assume Open
-	} else {
-		state = Open
+	if state.NotUnknown() && category == Bullet {
+		category = Todo
 	}
-	// if bullet do not return TaskState
+
 	if category == Bullet {
 		return Task{Category: category, Text: text, Depth: depth}
 	}
+	if state == tasklist.Unknown {
+		state = tasklist.Open
+	}
 
 	return Task{Category: category, State: state, Text: text, Depth: depth}
-}
-
-func getText(n ast.Node, source []byte) string {
-	if n.Type() == ast.TypeBlock {
-		var text bytes.Buffer
-		for i := 0; i < n.Lines().Len(); i++ {
-			line := n.Lines().At(i)
-			text.Write(line.Value(source))
-		}
-		return text.String()
-	}
-	return ""
 }
 
 func (noteplan *Noteplan) parseTasks(data []byte, doc ast.Node) []Task {
 	var tasks []Task
 	var depth = -1
 	markerMap := make(map[int]string)
+	stack := NewStack[Task]()
 
 	ast.Walk(doc, func(node ast.Node, enter bool) (ast.WalkStatus, error) {
+		// found a new (sub)list
 		if n, ok := node.(*ast.List); ok {
 			if enter {
+				// increasing depth counter when we enter a new list
 				depth = depth + 1
+				// TODO make it a char
 				markerMap[depth] = string((*n).Marker)
 			} else {
 				depth = depth - 1
 			}
 		}
 
-		if n, ok := node.(*ast.ListItem); ok && enter {
-			item := n.FirstChild()
-			text := getText(item, data)
-			task := noteplan.parseTask(markerMap[depth], text, depth)
-			tasks = append(tasks, task)
+		// WRONG: ot every ListItem is closed. We can hvae nested elements
+		if _, ok := node.(*ast.ListItem); ok {
+			if enter {
+				stack.Push(Task{})
+			} else {
+				taskStub := stack.Pop()
+				actualTask := noteplan.BuildTask(markerMap[depth], depth, taskStub.State, taskStub.Text)
+				tasks = append(tasks, actualTask)
+			}
 		}
 
-		if n, ok := node.(*tast.TaskCheckBox); ok && enter {
-			fmt.Println(n)
+		if n, ok := node.(*ast.Text); ok && stack.Size() > 0 {
+			// `* Blog <2024-02-10` results in two Text nodes
+			if enter {
+				taskStub := stack.Pop()
+				text := string(n.Text(data))
+				fmt.Println(text)
+				taskStub.Text = taskStub.Text + text
+				stack.Push(taskStub)
+			}
+		}
+
+		if n, ok := node.(*tasklist.TaskCheckBox); ok && enter {
+			taskStub := stack.Peek()
+			taskStub.State = n.State
 		}
 
 		return ast.WalkContinue, nil

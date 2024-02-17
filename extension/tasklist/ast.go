@@ -1,46 +1,9 @@
-package ast
+package tasklist
 
 import (
 	"fmt"
 	gast "github.com/yuin/goldmark/ast"
 )
-
-type TaskState int64
-
-const (
-	Open = iota
-	Cancelled
-	Done
-	Incomplete
-	Forwarded
-	Scheduling
-	Question
-	Important
-	Star
-	Quote
-	Location
-	Bookmark
-)
-
-func NewTaskState(b byte) TaskState {
-	return Open
-}
-
-func (s TaskState) Char() string {
-	switch s {
-	case Open:
-		return " "
-	case Cancelled:
-		return "-"
-	case Done:
-		return "x"
-	case Forwarded:
-		return ">"
-	}
-
-	// TOOD panic
-	return "u"
-}
 
 // A TaskCheckBox struct represents a checkbox of a task list.
 type TaskCheckBox struct {
@@ -51,7 +14,7 @@ type TaskCheckBox struct {
 // Dump implements Node.Dump.
 func (n *TaskCheckBox) Dump(source []byte, level int) {
 	m := map[string]string{
-		"State": fmt.Sprintf("%v", n.State.Char()),
+		"State": fmt.Sprintf("%v", n.State),
 	}
 	gast.DumpHelper(n, source, level, m, nil)
 }

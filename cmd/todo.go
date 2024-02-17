@@ -7,6 +7,7 @@ import (
 	"github.com/ijt/go-anytime"
 	"github.com/spf13/cobra"
 
+	tl "github.com/oschrenk/noteplan/extension/tasklist"
 	np "github.com/oschrenk/noteplan/internal"
 )
 
@@ -49,15 +50,15 @@ var todoCmd = &cobra.Command{
 		if err == nil {
 			for _, task := range tasks {
 				switch task.State {
-				case np.Cancelled:
+				case tl.Cancelled:
 					if ShowCancelled {
 						fmt.Println(task.String())
 					}
-				case np.Done:
+				case tl.Done:
 					if ShowDone {
 						fmt.Println(task.String())
 					}
-				case np.Open:
+				case tl.Open:
 					if (task.Category == np.Bullet && ShowBullet) ||
 						(task.Category == np.Todo) || (task.Category == np.Checklist) {
 						fmt.Println(task.String())

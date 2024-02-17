@@ -1,18 +1,12 @@
-package extension
+package tasklist
 
 import (
-	"regexp"
-
-	"github.com/oschrenk/noteplan/extension/ast"
-
 	"github.com/yuin/goldmark"
 	gast "github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 )
-
-var taskListRegexp = regexp.MustCompile(`^\[([\sxX])\]\s*`)
 
 type taskCheckBoxParser struct {
 }
@@ -47,14 +41,15 @@ func (s *taskCheckBoxParser) Parse(parent gast.Node, block text.Reader, pc parse
 		return nil
 	}
 	line, _ := block.PeekLine()
-	m := taskListRegexp.FindSubmatchIndex(line)
+	m := TaskStateRegexp.FindSubmatchIndex(line)
 	if m == nil {
 		return nil
 	}
 	value := line[m[2]:m[3]][0]
+
 	block.Advance(m[1])
-	state := ast.NewTaskState(value)
-	return ast.NewTaskCheckBox(state)
+	state := NewTaskState(value)
+	return NewTaskCheckBox(state)
 }
 
 func (s *taskCheckBoxParser) CloseBlock(parent gast.Node, pc parser.Context) {
