@@ -2,6 +2,8 @@ package internal
 
 import (
 	"log"
+
+	. "github.com/oschrenk/noteplan/model"
 )
 
 func logThenEmptyOrErr(err error, iso string, failFast bool) (*TaskSummary, error) {
@@ -9,6 +11,6 @@ func logThenEmptyOrErr(err error, iso string, failFast bool) (*TaskSummary, erro
 		log.Fatal(err)
 		return nil, err
 	} else {
-		return emptyTaskSummary(iso), nil
+		return EmptyTaskSummary(iso), nil
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	np "github.com/oschrenk/noteplan/internal"
+	. "github.com/oschrenk/noteplan/model"
 )
 
 func init() {
@@ -49,20 +50,20 @@ var todoCmd = &cobra.Command{
 		if err == nil {
 			for _, task := range tasks {
 				switch task.State {
-				case np.Cancelled:
+				case Cancelled:
 					if ShowCancelled {
 						fmt.Println(task.String())
 					}
-				case np.Done:
+				case Done:
 					if ShowDone {
 						fmt.Println(task.String())
 					}
-				case np.Open:
-					if (task.Category == np.Bullet && ShowBullet) ||
-						(task.Category == np.Todo) || (task.Category == np.Checklist) {
+				case Open:
+					if (task.Category == Bullet && ShowBullet) ||
+						(task.Category == Todo) || (task.Category == Checklist) {
 						fmt.Println(task.String())
 					}
-					if task.Category != np.Bullet {
+					if task.Category != Bullet {
 						open = open + 1
 					}
 				}

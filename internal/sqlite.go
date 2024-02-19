@@ -3,6 +3,8 @@ package internal
 import (
 	"database/sql"
 
+	. "github.com/oschrenk/noteplan/model"
+
 	_ "github.com/mattn/go-sqlite3"
 	"howett.net/plist"
 )
@@ -79,5 +81,5 @@ func (noteplan *Noteplan) fetch(iso string, entry string, failFast bool) (*TaskS
 	numOpenTodos := int(objects[indexes["numOpenTodos"].(plist.UID)].(uint64))
 	numDoneTodos := int(objects[indexes["numDoneTodos"].(plist.UID)].(uint64))
 
-	return newTaskSummary(iso, numOpenTodos, numDoneTodos), nil
+	return NewTaskSummary(iso, numOpenTodos, numDoneTodos), nil
 }

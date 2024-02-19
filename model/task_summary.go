@@ -1,4 +1,4 @@
-package internal
+package model
 
 type TaskSummary struct {
 	Iso    string `json:"iso"`
@@ -6,10 +6,10 @@ type TaskSummary struct {
 	Closed int    `json:"closed"`
 }
 
-func emptyTaskSummary(iso string) *TaskSummary {
+func EmptyTaskSummary(iso string) *TaskSummary {
 	return &TaskSummary{Iso: iso, Open: 0, Closed: 0}
 }
 
-func newTaskSummary(iso string, open int, closed int) *TaskSummary {
+func NewTaskSummary(iso string, open int, closed int) *TaskSummary {
 	return &TaskSummary{Iso: iso, Open: open, Closed: closed}
 }
