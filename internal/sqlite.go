@@ -2,12 +2,22 @@ package internal
 
 import (
 	"database/sql"
+	"log"
 
 	. "github.com/oschrenk/noteplan/model"
 
 	_ "github.com/mattn/go-sqlite3"
 	"howett.net/plist"
 )
+
+func logThenEmptyOrErr(err error, iso string, failFast bool) (*TaskSummary, error) {
+	if failFast {
+		log.Fatal(err)
+		return nil, err
+	} else {
+		return EmptyTaskSummary(iso), nil
+	}
+}
 
 func (noteplan *Noteplan) fetch(iso string, entry string, failFast bool) (*TaskSummary, error) {
 	db, err := sql.Open("sqlite3", noteplan.settings.NoteCachePath)
