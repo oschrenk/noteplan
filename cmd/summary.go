@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	np "github.com/oschrenk/noteplan/internal"
-	. "github.com/oschrenk/noteplan/model"
+	task "github.com/oschrenk/noteplan/model"
 )
 
 func init() {
@@ -43,7 +43,7 @@ var summaryCmd = &cobra.Command{
 		noteplan := np.NewInstance()
 
 		// collect data
-		taskSummaries := make(map[string]*TaskSummary)
+		taskSummaries := make(map[string]*task.TaskSummary)
 		if !weekOnly {
 			daySummary, _ := noteplan.Day(dateTime, failFast)
 			taskSummaries["day"] = daySummary

@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	. "github.com/oschrenk/noteplan/model"
+	model "github.com/oschrenk/noteplan/model"
 
 	"github.com/yuin/goldmark/ast"
 )
@@ -29,7 +29,7 @@ import (
 // - Recognize `*` as Todo
 // - Recognize `-` as Todo
 //
-// Additionally there is a trigger character for a "checlist" item
+// Additionally there is a trigger character for a "checklist" item
 //
 // - Plus `+`
 //
@@ -45,32 +45,32 @@ import (
 // - bullet
 // *  double spaced todo
 // -  double spaced bullet
-func (noteplan *Noteplan) parseTask(marker string, task string, depth int) Task {
-	var category TaskCategory
+func (noteplan *Noteplan) parseTask(marker string, task string, depth int) model.Task {
+	var category model.TaskCategory
 
 	switch {
 	case marker == "*":
 		if noteplan.settings.IsAsteriskTodo {
-			category = Todo
+			category = model.Todo
 		} else {
-			category = Bullet
+			category = model.Bullet
 		}
 	case marker == "-":
 		if noteplan.settings.IsDashTodo {
-			category = Todo
+			category = model.Todo
 		} else {
-			category = Bullet
+			category = model.Bullet
 		}
 	case marker == "+":
-		category = Checklist
+		category = model.Checklist
 	}
 	text := strings.TrimSpace(task)
 
 	return noteplan.parseTaskState(category, text, depth)
 }
 
-func (noteplan *Noteplan) parseTaskState(category TaskCategory, text string, depth int) Task {
-	var state TaskState
+func (noteplan *Noteplan) parseTaskState(category model.TaskCategory, text string, depth int) model.Task {
+	var state model.TaskState
 
 	stateRegEx := `^\[([\s-x])\].*`
 	re := regexp.MustCompile(stateRegEx)
@@ -81,30 +81,30 @@ func (noteplan *Noteplan) parseTaskState(category TaskCategory, text string, dep
 		// the user might have changed their settings in the past or might have
 		// manually changed a bullet item into a task item by using task markers
 		// if it's checklist we keep it
-		if category == Bullet {
-			category = Todo
+		if category == model.Bullet {
+			category = model.Todo
 		}
 		stateChar := matches[1]
 		text = strings.TrimSpace(text[3:])
 		switch {
-		case stateChar == Open.Trigger():
-			state = Open
-		case stateChar == Cancelled.Trigger():
-			state = Cancelled
-		case stateChar == Done.Trigger():
-			state = Done
+		case stateChar == model.Open.Trigger():
+			state = model.Open
+		case stateChar == model.Cancelled.Trigger():
+			state = model.Cancelled
+		case stateChar == model.Done.Trigger():
+			state = model.Done
 		}
 
 		// otherwise assume Open
 	} else {
-		state = Open
+		state = model.Open
 	}
 	// if bullet do not return TaskState
-	if category == Bullet {
-		return Task{Category: category, Text: text, Depth: depth}
+	if category == model.Bullet {
+		return model.Task{Category: category, Text: text, Depth: depth}
 	}
 
-	return Task{Category: category, State: state, Text: text, Depth: depth}
+	return model.Task{Category: category, State: state, Text: text, Depth: depth}
 }
 
 func getText(n ast.Node, source []byte) string {
@@ -119,8 +119,8 @@ func getText(n ast.Node, source []byte) string {
 	return ""
 }
 
-func (noteplan *Noteplan) parseTasks(data []byte, doc ast.Node) []Task {
-	var tasks []Task
+func (noteplan *Noteplan) parseTasks(data []byte, doc ast.Node) []model.Task {
+	var tasks []model.Task
 	var depth = -1
 	markerMap := make(map[int]string)
 

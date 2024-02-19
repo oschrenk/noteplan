@@ -4,22 +4,22 @@ import (
 	"database/sql"
 	"log"
 
-	. "github.com/oschrenk/noteplan/model"
+	model "github.com/oschrenk/noteplan/model"
 
 	_ "github.com/mattn/go-sqlite3"
 	"howett.net/plist"
 )
 
-func logThenEmptyOrErr(err error, iso string, failFast bool) (*TaskSummary, error) {
+func logThenEmptyOrErr(err error, iso string, failFast bool) (*model.TaskSummary, error) {
 	if failFast {
 		log.Fatal(err)
 		return nil, err
 	} else {
-		return EmptyTaskSummary(iso), nil
+		return model.EmptyTaskSummary(iso), nil
 	}
 }
 
-func (noteplan *Noteplan) fetch(iso string, entry string, failFast bool) (*TaskSummary, error) {
+func (noteplan *Noteplan) fetch(iso string, entry string, failFast bool) (*model.TaskSummary, error) {
 	db, err := sql.Open("sqlite3", noteplan.settings.NoteCachePath)
 	if err != nil {
 		return logThenEmptyOrErr(err, iso, failFast)
@@ -91,5 +91,5 @@ func (noteplan *Noteplan) fetch(iso string, entry string, failFast bool) (*TaskS
 	numOpenTodos := int(objects[indexes["numOpenTodos"].(plist.UID)].(uint64))
 	numDoneTodos := int(objects[indexes["numDoneTodos"].(plist.UID)].(uint64))
 
-	return NewTaskSummary(iso, numOpenTodos, numDoneTodos), nil
+	return model.NewTaskSummary(iso, numOpenTodos, numDoneTodos), nil
 }

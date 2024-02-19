@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/oschrenk/noteplan/model"
+	model "github.com/oschrenk/noteplan/model"
 )
 
 type Noteplan struct {
@@ -15,7 +15,7 @@ func NewInstance() Noteplan {
 	return Noteplan{settings: LoadSettings()}
 }
 
-func (noteplan *Noteplan) GetTasks(dateTime time.Time, tp TimePrecision) ([]Task, error) {
+func (noteplan *Noteplan) GetTasks(dateTime time.Time, tp TimePrecision) ([]model.Task, error) {
 	entry := ""
 	switch tp {
 	case Day:
@@ -38,14 +38,14 @@ func (noteplan *Noteplan) GetTasks(dateTime time.Time, tp TimePrecision) ([]Task
 	return tasks, nil
 }
 
-func (noteplan *Noteplan) Day(dateTime time.Time, failFast bool) (*TaskSummary, error) {
+func (noteplan *Noteplan) Day(dateTime time.Time, failFast bool) (*model.TaskSummary, error) {
 	iso := dateTime.Format("2006-01-02")
 	entry := fmt.Sprint(dateTime.Format("20060102"), ".", noteplan.settings.Extension)
 
 	return noteplan.fetch(iso, entry, failFast)
 }
 
-func (noteplan *Noteplan) Week(dateTime time.Time, failFast bool) (*TaskSummary, error) {
+func (noteplan *Noteplan) Week(dateTime time.Time, failFast bool) (*model.TaskSummary, error) {
 	year, week := dateTime.ISOWeek()
 	iso := fmt.Sprint(year, "-W", fmt.Sprintf("%02d", week))
 	entry := fmt.Sprint(iso, ".", noteplan.settings.Extension)
