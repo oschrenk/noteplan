@@ -9,7 +9,7 @@ type Log struct {
 	Enabled bool
 }
 
-var mylog = log.New(os.Stderr, "", log.LstdFlags)
+var errLog = log.New(os.Stderr, "", log.LstdFlags)
 
 var Logger = Log{
 	Enabled: false,
@@ -17,6 +17,6 @@ var Logger = Log{
 
 func (logger *Log) Log(s string) {
 	if logger.Enabled {
-		mylog.Println(s)
+		errLog.Println(s)
 	}
 }
