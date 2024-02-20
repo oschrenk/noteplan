@@ -10,11 +10,16 @@ import (
 	"github.com/yuin/goldmark/text"
 )
 
-func parseMarkdown(path string) ([]byte, ast.Node, error) {
-
+func parseString(data []byte) ([]byte, ast.Node, error) {
 	markdown := goldmark.New(
 		goldmark.WithExtensions(),
 	)
+
+	doc := markdown.Parser().Parse(text.NewReader(data))
+	return data, doc, nil
+}
+
+func parseFile(path string) ([]byte, ast.Node, error) {
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -29,7 +34,6 @@ func parseMarkdown(path string) ([]byte, ast.Node, error) {
 		return nil, nil, err
 	}
 
-	doc := markdown.Parser().Parse(text.NewReader(data))
+	return parseString(data)
 
-	return data, doc, nil
 }

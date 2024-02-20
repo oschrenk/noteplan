@@ -28,7 +28,7 @@ func (noteplan *Noteplan) GetTasks(dateTime time.Time, tp TimePrecision) ([]mode
 		return nil, fmt.Errorf("unsupported precision %s", tp)
 	}
 	path := noteplan.settings.CalendarDataPath + "/" + entry
-	data, doc, err := parseMarkdown(path)
+	data, doc, err := parseFile(path)
 	if err != nil {
 		return nil, err
 	}
