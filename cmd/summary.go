@@ -40,7 +40,7 @@ var summaryCmd = &cobra.Command{
 			dateTime = parsedDay
 		}
 
-		noteplan := np.NewInstance()
+		noteplan := np.DefaultInstance()
 
 		// collect data
 		taskSummaries := make(map[string]*task.TaskSummary)

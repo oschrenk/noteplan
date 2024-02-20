@@ -11,8 +11,13 @@ type Noteplan struct {
 	settings Settings
 }
 
-func NewInstance() Noteplan {
-	return Noteplan{settings: LoadSettings()}
+func DefaultInstance() Noteplan {
+	settings := LoadSettings()
+	return NewInstance(settings)
+}
+
+func NewInstance(settings Settings) Noteplan {
+	return Noteplan{settings: settings}
 }
 
 func (noteplan *Noteplan) GetTasks(dateTime time.Time, tp TimePrecision) ([]model.Task, error) {

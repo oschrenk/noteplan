@@ -44,7 +44,7 @@ var todoCmd = &cobra.Command{
 			dateTime = parsedDay
 		}
 
-		noteplan := np.NewInstance()
+		noteplan := np.DefaultInstance()
 		tasks, err := noteplan.GetTasks(dateTime, precision)
 		open := 0
 		if err == nil {
