@@ -1,9 +1,5 @@
 package model
 
-import (
-	"log"
-)
-
 type TaskState int64
 
 const (
@@ -12,16 +8,12 @@ const (
 	Done
 )
 
-func (s TaskState) Trigger() string {
-	switch s {
-	case Open:
-		return " "
-	case Cancelled:
-		return "-"
-	case Done:
-		return "x"
-	}
+var mapTaskState = map[TaskState]string{
+	Open:      " ",
+	Cancelled: "-",
+	Done:      "x",
+}
 
-	log.Panicf("failed getting trigger for state: %s", s)
-	return "unknown"
+func (s TaskState) Trigger() string {
+	return mapTaskState[s]
 }
