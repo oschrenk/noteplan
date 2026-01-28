@@ -10,7 +10,7 @@ Print todos
 
 ```
 noteplan todo
-󰄴 Unpack luggage 
+󰄴 Unpack luggage
 󰝦 Grocery shopping
    Eggs
    Chicken
